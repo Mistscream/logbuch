@@ -1,0 +1,14 @@
+{
+  "name": "problem-logbuch",
+  "version": "1.0.0",
+  "description": "Logbuch für das Universitätsmodul Semantische Suche.",
+  "scripts": {
+    "watch": "rm -Rf ./out && mkdir ./out && latexmk -pvc -pdf -shell-escape -output-directory=out main.tex"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mistscream/logbuch.git"
+  },
+  "author": "Christoph Stach",
+  "license": "ISC"
+}

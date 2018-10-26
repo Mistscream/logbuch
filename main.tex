@@ -1,0 +1,130 @@
+\documentclass[chapterprefix=false, 12pt, a4paper, oneside, parskip=half, listof=totoc, bibliography=totoc, numbers=noendperiod]{scrbook}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[bottom=48mm,left=25mm,right=25mm]{geometry}
+\usepackage[onehalfspacing]{setspace}
+\usepackage[stretch=10]{microtype}
+\usepackage{xcolor}
+\usepackage{scrhack}
+\usepackage{titling}
+\usepackage[outputdir=out]{minted}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage[ngerman]{babel}
+\usepackage{biblatex}
+
+
+\renewcommand*{\chapterheadstartvskip}{\vspace*{.25\baselineskip}}
+\def\changemargin#1#2{\list{}{\rightmargin#2\leftmargin#1}\item[]}
+\let\endchangemargin=\endlist
+
+\definecolor{htwgruen}{RGB}{118, 185, 0}
+\definecolor{htwblau}{RGB}{0, 130, 209}
+\definecolor{htworange}{RGB}{255, 95, 0}
+\definecolor{htwgrau}{RGB}{175, 175, 175}
+
+\title{Problemlogbuch: Semantische Suche}
+\author{Christoph Stach, usw.}
+\date{01.11.2016 bis 30.09.2018}
+
+\addbibresource{main.bib}
+\defbibheading{none}[\bibname]{
+%%
+}
+
+\begin{document}
+    \begin{titlepage}
+        % Logo
+        \includegraphics[width=0.50\textwidth]{img/Q01_HTW_Berlin_Logo_quer_pos_FARBIG_CMYK.eps}
+
+        % Abstand nach logo
+        \vspace{4.0cm}
+
+        % Textkörper
+        \begin{changemargin}{0.5cm}{0.0cm}
+            % Dokumenttyp
+            \color{htwgrau}
+            \normalsize
+            \textsf{\noindent\MakeUppercase{Dokumenttyp}} \vspace{-20pt}\\
+            % Horizontale Linie
+            \noindent\rule{\textwidth}{0.5pt}\vspace{-4pt}
+            % Title
+            \color{black}
+            \huge
+            \textsf{Problemlogbuch: Semantische Suche}
+            \vspace{12pt}
+
+            % Author
+            \color{htwgrau}
+            \normalsize
+            \textsf{\MakeUppercase{Author}}\\
+            \color{black}
+            \large
+            \textsf{\theauthor}
+
+            % Zeitraum
+            \color{htwgrau}
+            \normalsize
+            \textsf{\MakeUppercase{Zeitraum}}\\
+            \color{black}
+            \large
+            \textsf{\thedate}
+
+            % Am Ende der Seite
+            \vfill
+
+            % Firma
+            \color{htwgrau}
+            \normalsize
+            \textsf{\MakeUppercase{Modul}}\\
+            \color{black}
+            \large
+            \textsf{Spezielle Anwendungen der Informatik: Do-IT-yourself: Semantische Suche}
+
+            % Dozent
+            \color{htwgrau}
+            \normalsize
+            \textsf{\MakeUppercase{Dozent}}\\
+            \color{black}
+            \large
+            \textsf{Prof. Dr. Hoppe}
+            \vspace{-60pt}
+        \end{changemargin}
+    \end{titlepage}
+
+    \tableofcontents
+
+    \chapter{Allgemeines}
+
+    \section{Beschreibung des Unternehmens}
+
+    \subsection{Subsection}
+
+    \subsubsection{SubSubSection}
+
+    \section{Syntax-HL}
+
+    \begin{minted}[xleftmargin=20pt,linenos,breaklines]{javascript}
+    function DividendsController(apiClient, \$q, \$state, \$scope) {
+        var vm = this;
+        vm.saved = false;
+
+        function onStateChange(event, toState, toParams) {
+            if (!vm.saved) {
+                if (!confirm('Wollen Sie die Seite...?')) {
+                    event.preventDefault();
+                }
+            }
+        }
+    }
+    \end{minted}
+
+    % \chapter{Anhang}
+
+    % \section{Literaturverzeichnis}
+
+    % \printbibliography[heading=none]
+
+    % \section{Glossar}
+\end{document}
