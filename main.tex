@@ -8,11 +8,14 @@
 \usepackage{xcolor}
 \usepackage{scrhack}
 \usepackage{titling}
-\usepackage[outputdir=out]{minted}
+\usepackage{minted}
 \usepackage{graphicx}
 \usepackage{hyperref}
 \usepackage[ngerman]{babel}
 \usepackage{biblatex}
+\usepackage[outdir=./]{epstopdf}
+\pdfminorversion=7
+\usepackage{csquotes}
 
 
 \renewcommand*{\chapterheadstartvskip}{\vspace*{.25\baselineskip}}
@@ -24,11 +27,18 @@
 \definecolor{htworange}{RGB}{255, 95, 0}
 \definecolor{htwgrau}{RGB}{175, 175, 175}
 
-\title{Problemlogbuch: Semantische Suche}
-\author{Christoph Stach, usw.}
-\date{01.11.2016 bis 30.09.2018}
+\title{Problemlogbuch I}
+
+\author{Nadzeya Ilyina\\
+Sebastian Jüngling\\
+Roman Laas 547499\\
+Marc Schmeling 553407\\
+Christoph Stach}
+
+\date{26.10.2018 bis 23.11.2018}
 
 \addbibresource{main.bib}
+
 \defbibheading{none}[\bibname]{
 %%
 }
@@ -47,12 +57,14 @@
             \color{htwgrau}
             \normalsize
             \textsf{\noindent\MakeUppercase{Dokumenttyp}} \vspace{-20pt}\\
+
             % Horizontale Linie
             \noindent\rule{\textwidth}{0.5pt}\vspace{-4pt}
+            
             % Title
             \color{black}
             \huge
-            \textsf{Problemlogbuch: Semantische Suche}
+            \textsf{\thetitle}
             \vspace{12pt}
 
             % Author
@@ -71,10 +83,7 @@
             \large
             \textsf{\thedate}
 
-            % Am Ende der Seite
-            \vfill
-
-            % Firma
+            % Modul
             \color{htwgrau}
             \normalsize
             \textsf{\MakeUppercase{Modul}}\\
@@ -88,23 +97,31 @@
             \textsf{\MakeUppercase{Dozent}}\\
             \color{black}
             \large
-            \textsf{Prof. Dr. Hoppe}
+            \textsf{Dr. rer. nat. Thomas Hoppe}
             \vspace{-60pt}
+
+            % Am Ende der Seite
+            \vfill
         \end{changemargin}
     \end{titlepage}
 
+	% Inhaltsverzeichnis
     \tableofcontents
 
-    \chapter{Allgemeines}
+    \chapter{Aufgabenverteilung}
+	Moderation: Sebastian Jüngling\\
+	Protokoll: Roman Laas
 
-    \section{Beschreibung des Unternehmens}
+    \chapter{Abstract}
 
-    \subsection{Subsection}
+    \chapter{Formulierung der Lernziele}
 
-    \subsubsection{SubSubSection}
+	\chapter{Einführung}
+	\section{Section}
+	\subsection{Subsection}
+	\subsubsection{Subsubsection}
 
-    \section{Syntax-HL}
-
+    \section{Beispiel Syntax-HL}
     \begin{minted}[xleftmargin=20pt,linenos,breaklines]{javascript}
     function DividendsController(apiClient, \$q, \$state, \$scope) {
         var vm = this;
