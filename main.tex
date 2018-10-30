@@ -8,12 +8,12 @@
 \usepackage{xcolor}
 \usepackage{scrhack}
 \usepackage{titling}
-\usepackage{minted}
+\usepackage[outputdir=out]{minted}
 \usepackage{graphicx}
 \usepackage{hyperref}
 \usepackage[ngerman]{babel}
 \usepackage{biblatex}
-\usepackage[outdir=./]{epstopdf}
+\usepackage[outdir=out/]{epstopdf}
 \pdfminorversion=7
 \usepackage{csquotes}
 
@@ -33,7 +33,7 @@
 Sebastian Jüngling\\
 Roman Laas 547499\\
 Marc Schmeling 553407\\
-Christoph Stach}
+Christoph Stach 555912}
 
 \date{26.10.2018 bis 23.11.2018}
 
@@ -67,13 +67,15 @@ Christoph Stach}
             \textsf{\thetitle}
             \vspace{12pt}
 
-            % Author
+            % Authoren
             \color{htwgrau}
             \normalsize
-            \textsf{\MakeUppercase{Author}}\\
+            \textsf{\MakeUppercase{Autoren}}\\
             \color{black}
             \large
             \textsf{\theauthor}
+
+            \vfill
 
             % Zeitraum
             \color{htwgrau}
@@ -98,10 +100,10 @@ Christoph Stach}
             \color{black}
             \large
             \textsf{Dr. rer. nat. Thomas Hoppe}
-            \vspace{-60pt}
+
 
             % Am Ende der Seite
-            \vfill
+
         \end{changemargin}
     \end{titlepage}
 
