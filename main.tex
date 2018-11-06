@@ -127,6 +127,14 @@ Christoph Stach 555912}
 
 	\chapter{Einleitung}
 
+\section{Webcrawler (Laas)}
+Mit der Kommerzialisierung des World Wide Web Anfang bis Mitte der 90er Jahre und dem damit verbundenen Boom an neuen Informationen auf neuen Plattformen stieg bei den Nutzern der Bedarf an Orientierung und Ordnung. In dieser Zeit formten sich die ersten Suchmaschinen, von denen die meisten heute nicht mehr bekannt oder sogar nicht mehr existent sind. Obwohl es auch händisch gepflegte Katalog-Suchmaschinen wie das damalige Yahoo! gab, setzten schon in den ersten Jahren viele Anbieter auf Webcrawler.\\\\
+Webcrawler sind Computerprogramme, die das Internet wiederholt automatisch durchsuchen und analysieren. Der Name (zu deutsch wörtlich Raupe) etablierte sich mit der Suchmaschine ''WebCrawler'', welche als eine der ersten eine Volltextindex-Suche anbot. Crawler ermöglichen Suchmaschinen die Pflege des Index indem sie neue, veränderte oder gelöschte Ressourcen finden. Die übliche Vorgehensweise beim ''crawlen'' ist dabei das Abarbeiten von Hyperlinks auf analysierten Webseiten. So können theoretisch alle verlinkten und öffentlich zugänglichen Seiten gefunden werden.
+
+\section{Robots Exclusion Standart (Laas)}
+Schon mit dem Aufkommen der ersten Webcrawler bemerkte man, dass diese häufig für Engpässe oder gar Ausfälle (Denial of Service) bei der Verfügbarkeit von Webservern verantwortlich waren. Im Frühjahr 1994 schlug Martijn Koster deshalb über den damals viel beachteten ''www-talk'' Mailverteiler die Nutzung einer robots.txt vor, welche solche Probleme in Zukunft verhindern oder zumindest abmildern soll. Webseitenbetreiber sollten diese Datei hierfür in einem einheitlichen Format im Stammverzeichnis ihrer Domain anlegen und mit Anweisungen und Regeln an Webcrawler füllen. Die Idee fand großen Anklang und wurde in kurzer Zeit zum de facto Standard erhoben.\\
+tbf Erläuterung Format
+
     \chapter{Planung}
 
     Um die Implementierung des Python-Crawlers zu planen haben wir uns zuerst über Libraries in Python zum Crawlen von Webseiten
@@ -134,7 +142,6 @@ Christoph Stach 555912}
     und Scrapy\footnote{\url{https://scrapy.org}}. Bei BeautifulSoup fiel direkt auf, dass das Projekt nicht mehr aktiv weiterentwickelt wird,
     da der letzte Commit auf Github am 05.06.2015 war. Scrapy ist außerdem ein komplettes Framework mit etlichen bereits vorhadenen
     Werkzeugen und einer sehr guten Dokumentation. Deswegen fiel unsere Wahl auf Scrapy.
-
 
 	\chapter{Implementierung}
 
