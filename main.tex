@@ -8,12 +8,12 @@
 \usepackage{xcolor}
 \usepackage{scrhack}
 \usepackage{titling}
-\usepackage[outputdir=out]{minted}
+\usepackage{minted}
 \usepackage{graphicx}
 \usepackage{hyperref}
 \usepackage[ngerman]{babel}
 \usepackage{biblatex}
-\usepackage[outdir=out/]{epstopdf}
+\usepackage[outdir=./]{epstopdf}
 \pdfminorversion=7
 \usepackage{csquotes}
 
@@ -126,6 +126,15 @@ Christoph Stach 555912}
 \end{itemize}
 
 	\chapter{Einleitung}
+
+\section{Webcrawler (Laas)}
+Mit der Kommerzialisierung des World Wide Web Anfang bis Mitte der 90er Jahre und dem damit verbundenen Boom an neuen Informationen auf neuen Plattformen stieg bei den Nutzern der Bedarf an Orientierung und Ordnung. In dieser Zeit formten sich die ersten Suchmaschinen, von denen die meisten heute nicht mehr bekannt oder sogar nicht mehr existent sind. Obwohl es auch händisch gepflegte Katalog-Suchmaschinen wie das damalige Yahoo! gab, setzten schon in den ersten Jahren viele Anbieter auf Webcrawler.\\\\
+Webcrawler sind Computerprogramme, die das Internet wiederholt automatisch durchsuchen und analysieren. Der Name (zu deutsch wörtlich Raupe) etablierte sich mit der Suchmaschine ''WebCrawler'', welche als eine der ersten eine Volltextindex-Suche anbot. Crawler ermöglichen Suchmaschinen die Pflege des Index indem sie neue, veränderte oder gelöschte Ressourcen finden. Die übliche Vorgehensweise beim ''crawlen'' ist dabei das Abarbeiten von Hyperlinks auf analysierten Webseiten. So können theoretisch alle verlinkten und öffentlich zugänglichen Seiten gefunden werden.
+
+\section{Robots Exclusion Standart (Laas)}
+Schon mit dem Aufkommen der ersten Webcrawler bemerkte man, dass diese häufig für Engpässe oder gar Ausfälle (Denial of Service) bei der Verfügbarkeit von Webservern verantwortlich waren. Im Frühjahr 1994 schlug Martijn Koster deshalb über den damals viel beachteten ''www-talk'' Mailverteiler die Nutzung einer robots.txt vor, welche solche Probleme in Zukunft verhindern oder zumindest abmildern soll. Webseitenbetreiber sollten diese Datei hierfür in einem einheitlichen Format im Stammverzeichnis ihrer Domain anlegen und mit Anweisungen und Regeln an Webcrawler füllen. Die Idee fand großen Anklang und wurde in kurzer Zeit zum de facto Standard erhoben.\\
+tbf Erläuterung Format
+
 	\chapter{Implementierung}
 	\chapter{Speicherung}
 	\chapter{Textaufbereitung}
