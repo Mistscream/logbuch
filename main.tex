@@ -126,7 +126,122 @@ Christoph Stach 555912}
 \end{itemize}
 
 	\chapter{Einleitung}
+
+    \chapter{Planung}
+
+    Um die Implementierung des Python-Crawlers zu planen haben wir uns zuerst über Libraries in Python zum Crawlen von Webseiten
+    informiert. Die im Internet meist verwendeten Libraries sind BeautifulSoup4\footnote{\url{https://pypi.org/project/beautifulsoup4}}
+    und Scrapy\footnote{\url{https://scrapy.org}}. Bei BeautifulSoup fiel direkt auf, dass das Projekt nicht mehr aktiv weiterentwickelt wird,
+    da der letzte Commit auf Github am 05.06.2015 war. Scrapy ist außerdem ein komplettes Framework mit etlichen bereits vorhadenen
+    Werkzeugen und einer sehr guten Dokumentation. Deswegen fiel unsere Wahl auf Scrapy.
+
+
 	\chapter{Implementierung}
+
+    \section{Scrapy-Crawler}
+
+    Scrapy bietet ein CLI Programm zum Erstellen eines initialen Scrapy Projektes.
+    Das Projekt ist danach logisch in folgende Komponenten aufgeteilt: Spiders, Items, Middlewares, Pipelines.
+    Im Folgenden gehen wir darauf ein, wie die unterschiedlichen Komponenten arbeiten und wie wir sie für die
+    Erreichung unseres Lernzieles eingesetzt haben.
+
+    \subsection{Spider}
+
+    Ein Spider ist der Kern von Scrapy. Dieser crawlt die Seiten und extrahiert gewünschte Informationen.
+    Es wird dabei eine Start-URL definiert. Ausgehend von dieser URL crawlt Scrapy alles was als Request-Objekt in
+    eine Queue gelegt wird. Ein Request-Objekt besteht aus der zu crawlenden URL, sowie einer Referenz zu einer Callback-Funktion,
+    mit der die Seite gecrawlt werden soll. Um Informationen, wie z.B. URLs, aus dem HTML Quelltext zu extrahieren, kann man bei Scrapy
+    mit CSS-Selektoren arbeiten.
+
+    Auf der Seite der Berliner Polizei gibt es drei verschiedene Seitenarten die vom Crawl-Vorgang
+    unterschiedlich behandelt werden müssen. Die Archivübersichtsseite beinhaltet Links zu den unterschiedlichen Archiven.
+    Archive sind nach Jahren kategorisiert. Wir haben alle Links zu den Jahresarchiven extrahiert und sie als Request-Objekt in die Queue gelegt.
+
+    \begin{minted}[xleftmargin=20pt,linenos,breaklines,fontsize=\small]{python}
+    def parse(self, response):
+        for archive in response.css('.column-content .textile > ul > li > a'):
+            url = self.base_url + archive.css('::attr(href)').extract_first()
+
+            yield scrapy.Request(url=url, callback=self.parse_archive)
+    \end{minted}
+
+    Die Archivseite beinhaltet Links zu den Polizeitberichten. Außerdem wird hier jeder Bericht mit einer Kategorie/Ort
+    und einem Datum gekennzeichnet. Die Archivseite ist desweiterem in mehrere Seiten gegliedert. Pro Seite werden 50 Berichte angezeigt.
+    Durch extrahieren des "`Nächste Seite"'-Links und einem rekursiven Aufruf der Funktion können wir alle Seiten aus einem
+    Archiv crawlen. Auf jeder Seite werden die Links zu den Berichten extrahiert und als Request-Objekt in die Queue gelegt.
+
+    \begin{minted}[xleftmargin=20pt,linenos,breaklines,fontsize=\small]{python}
+    def parse_archive(self, response):
+        for report in response.css('.list-autoteaser > li.row-fluid'):
+            timestamp = report.css('.date::text').extract_first()
+            category = report.css('.category::text').extract_first()
+
+            url = self.base_url + report.css('a::attr(href)').extract_first()
+
+            yield scrapy.Request(
+                url=url,
+                callback=self.parse_report,
+                meta={'timestamp': timestamp, 'category': category}
+            )
+
+        next_page_url = response.css('.html5-nav > div > ul > .pager-item-next > a::attr(href)').extract_first()
+
+        if next_page_url:
+            next_page_url = self.base_url + next_page_url
+
+            yield scrapy.Request(url=next_page_url, callback=self.parse_archive)
+    \end{minted}
+
+    \pagebreak
+
+    Als letztes gibt es die Seite des Polizeitberichts selbst.
+    Hier extrahieren wir den kompletten Text des Berichts über folgenden CSS-Selector.
+
+    \begin{minted}[xleftmargin=20pt,linenos,breaklines,fontsize=\small]{python}
+    response.css(
+        '.column-content > .article > .body .polizeimeldung::text,' +
+        '.column-content > .article > .body p::text,' +
+        '.column-content > .article > .body strong::text'
+    ).extract()
+    \end{minted}
+
+    Außerdem wird ein Item-Objekt mit den Daten des Berichts erstellt, welches anders als ein Request-Objekt behandelt wird.
+
+    \subsection{Item}
+
+    Bei Scrapy werden die extrahierten Daten in Items zusammengefasst. Hierzu dient eine einfache Klasse.
+    In unserem Fall haben wir ein Item für die Polizeiberichte definiert.
+
+    \begin{minted}[xleftmargin=20pt,linenos,breaklines,fontsize=\small]{python}
+    class PoliceReportBerlinItem(scrapy.Item):
+        # define the fields for your item here like:
+        created = scrapy.Field()
+        updated = scrapy.Field()
+        timestamp = scrapy.Field()
+        category = scrapy.Field()
+        raw = scrapy.Field()
+        text = scrapy.Field()
+        text_pre_processed = scrapy.Field()
+        url = scrapy.Field()
+        title = scrapy.Field()
+    \end{minted}
+
+    \subsection{Middleware}
+
+    Mit einer Middleware kann auf alle von Scrapy getätigten Requests eingegangen werden. Wir benutzen keine selbsterstelle
+    Middleware in unserem Projekt. Jedoch werden bei Scrapy einige Middlewares standardmäßig aktiviert, wie z.B.
+    die RetryMiddleware, welche einen Request ein weiteres Mal in die Queue aufnimmt, falls er fehlschlägt.
+
+    Für die Implementierung einer eigenen Middleware wären unterschiedliche Szenarien vorstellbar. Zum Beispiel könnte man
+    jeden Request mit bestimmten Cookies versehen, wenn die Seite einen Login erfordert. Für unseren Fall war das jedoch nicht
+    notwendig.
+
+    \subsection{Pipeline}
+
+    Jedes von Scrapy gecrawlte Item wird in einer definierten Reihenfolge durch alle definierten Pipelines gesendet.
+    In unserem Fall haben wir eine MongoDB Pipeline an letzter Stelle erstellt, die den Bericht in einer MongoDB-Datenbank abspeichert.
+
+
 	\chapter{Speicherung}
 	\chapter{Textaufbereitung}
 	\section{Section}
