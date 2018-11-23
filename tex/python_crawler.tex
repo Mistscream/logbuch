@@ -1,22 +1,24 @@
-\chapter{Implementierung}
 
-\section{Scrapy-Crawler}
+
+\chapter{Python Crawler \small(Stach \& Ilyina)}
 
 Scrapy bietet ein CLI Programm zum Erstellen eines initialen Scrapy Projektes.
 Das Projekt ist danach logisch in folgende Komponenten aufgeteilt: Spiders, Items, Middlewares, Pipelines.
 Im Folgenden gehen wir darauf ein, wie die unterschiedlichen Komponenten arbeiten und wie wir sie für die
 Erreichung unseres Lernzieles eingesetzt haben.
 
-\subsection{Planung}
+\section{Planung}
 
 Um die Implementierung des Python-Crawlers zu planen haben wir uns zuerst
 über Libraries in Python zum Crawlen von Webseiten informiert. Die im
 Internet meist verwendeten Libraries sind BeautifulSoup4\cite{beausoup}
-und Scrapy\cite{scrapy} . Bei BeautifulSoup fiel direkt auf, dass das Projekt
+und Scrapy\cite{scrapy}. Bei BeautifulSoup fiel direkt auf, dass das Projekt
 nicht mehr aktiv weiterentwickelt wird, da der letzte Commit auf Github am
 05.06.2015 war. Scrapy ist außerdem ein komplettes Framework mit etlichen
 bereits vorhadenen Werkzeugen und einer sehr guten Dokumentation. Deswegen
 fiel unsere Wahl auf Scrapy.
+
+\section{Implementierung}
 
 \subsection{Spider}
 
@@ -113,3 +115,6 @@ notwendig.
 
 Jedes von Scrapy gecrawlte Item wird in einer definierten Reihenfolge durch alle definierten Pipelines gesendet.
 In unserem Fall haben wir eine MongoDB Pipeline an letzter Stelle erstellt, die den Bericht in einer MongoDB-Datenbank abspeichert.
+
+\section{Ergebnis}
+
