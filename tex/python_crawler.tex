@@ -94,12 +94,16 @@ In unserem Fall haben wir ein Item für die Polizeiberichte definiert.
         updated = scrapy.Field()
         timestamp = scrapy.Field()
         category = scrapy.Field()
-        raw = scrapy.Field()
         text = scrapy.Field()
-        text_pre_processed = scrapy.Field()
+
+        text_pre_processed_v1 = scrapy.Field()
+        text_pre_processed_v2 = scrapy.Field()
+        text_pre_processed_v3 = scrapy.Field()
+        text_pre_processed_v4 = scrapy.Field()
+
         url = scrapy.Field()
         title = scrapy.Field()
-    \end{minted}
+\end{minted}
 
 \subsection{Middleware}
 
@@ -117,4 +121,17 @@ Jedes von Scrapy gecrawlte Item wird in einer definierten Reihenfolge durch alle
 In unserem Fall haben wir eine MongoDB Pipeline an letzter Stelle erstellt, die den Bericht in einer MongoDB-Datenbank abspeichert.
 
 \section{Ergebnis}
+
+Wir konnte erfolgreich einen Crawler implementieren, der alle archivierten Polizeimeldung der Berliner Polizei herunterläd
+und in einer MongoDB speichert. Die Arbeit mit Scrapy stellte sich dabei als sehr komfortabel heraus.
+Durch die vielen Einstellungsmöglichkeiten war es leicht einen zuverlässigen Crawler zu realisieren.
+Außerdem schlägt einem Scrapy direkt eine übersichtliche Datei und Ordnerstruktur vor. Dadaurch waren wir in der Lage einen zuverlässigen Crawler
+von hoher Codequalität und Erweiterbarkeit zu entwickeln
+
+Im Laufe des des Projektes bekamen wir Fehlermeldung, dass wir zu viele Anfrangen gleichzeitig an den Server senden.
+Unsere Anfrangen wurdem demnach abgelehnt. Durch die leichte Konfigurierbarkeit von Spacy konnten wir dieses Problem schnell lösen.
+Es musste lediglich die Variable \textbf{DOWNLOAD\_DELAY}  auf den Wert 0.25 gesetzt werden, um ein Verzögerung zwischen den Seitenaufrufen zu
+erwirken.
+
+
 
