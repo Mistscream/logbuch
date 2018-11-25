@@ -6,11 +6,106 @@ Um die Texte der Berliner Polizeiberichte in späteren Arbeitsschritten für die
 \section{SpaCy}
 Die Open-Source Library SpaCy ermöglicht fortgeschrittenes Natural Language Processing für mehrere Sprachen, unter Anderem der deutschen. SpaCy bietet hierfür eine Vielzahl verschiedener Features, wie z.B. Tokenization, Lammatization, Part-of-Speech Tagging, dependency parsing und demenentsprechend besonders wichtige Features, wie das Erkennen von Noun-Phrases (Nominalphrasen) und Named-Entitities (Textelemente vordefinierter Kategorien). 
 
-\subsection{Umsetzung}
+\section{Umsetzung}
 Im folgenden wird auf die grundsätzliche Funktionsweise der implementierten Textaufbereitung unter der Verwendung von SpaCy eingegangen.
 
-\subsection{Ergebnis}
+Für die Textaufbereitung wurde ein Package mit Python 3 erstellt, welches die Klasse Preprocess enthält. Dieser Klasse muss zur Initialisierung der zu bearbeitende Text übergeben werden. Der übergebene Text wird mithilfe des deutschen Sprachmodells von SpaCy als ein von SpaCy bereitgestelltes nlp-Objekt initialisiert. 
+\\Das bereitgestellte deutsche Sprachmodell wurde auf Wikipedia Texte und dem TIGER Corpus trainiert, um so die Syntax der Texte untersuchen zu können. Unter Verwendung dieses Modells berechnet SpaCy zur nlp-Objekt-Initialisierung automatisch wichtige Textinformationen, wie Tokens, Part-of-Speech Tags, Noun-Phrases, Named-Entities und mehr. Unter Verwendung dieser Textinformationen berechnet die selbstgeschriebene Preprocess-Klasse eine der deutschen Sprache angepasste Textaufbereitung.
 
+\subsubsection{Tokenization}
+Als erstes ermittelt SpaCy während der nlp-Objekt-Initialisierung die Tokens des Textes mithilfe sprachspezifischer Regeln. Sollten diese Tokenisierungsregeln nicht ausreichend sein, gibt es die Möglichkeit den Tokenizer von SpaCy, unter Verwendung von regulären Ausdrücken, zu erweitern. 
+\\Bei dem speziellen Fall der Polizeiberichte kommt es oft zu Wortkonstellationen, wie z.B. '24-jähriger'. Der Standardtokenizer würde dies falsch interpretieren und nicht in Tokens wie '24' und 'jähriger' aufteilen. Die Tokenizer-Klasse von SpaCy wurde also mit einer eigenen Regel erweitert, die besagt, dass Konstellationen, die mit einer Zahl beginnen, einem Wort enden und einem Bindestrich getrennt werden, aufgeteilt werden müssen.
+
+\subsubsection{Part-of-Speech Tags und Dependency-Parsing}
+Nach der Tokenisierung analysiert SpaCy die ermittelten Tokens unter Verwendung der Sprachmodelle und gibt eine Vorhersage des bestmöglich passenden Part-of-Speech Tag (Wortart) des entsprechenden Tokens im Kontext des jeweiligen Satzes an. Im Zuge dessen berechnet SpaCy außerdem die Abhängigkeiten der Tokens untereinander.
+
+\subsubsection{Nominalphrasen}
+Mithilfe der Informationen zu den Wortarten und Wortabhängigkeiten der Tokens untereinander ermittelt SpaCy Nominalphrasen, Wortgruppen abgeschlossener Einheiten, wie z.B. "Der erschossene 85-jährige Rentner".  
+
+\subsubsection{Named-Entities}
+Des Weiteren ist es für SpaCy möglich Named-Entities, Textelemente vordefiniert Kategorien, zu ermitteln. Diese Art der Informationsextraktion ist besonders abhängig von der Genauigkeit des zur Verfügung stehenden Sprachmodells. So gibt es leider für das deutsche Modell, weniger Named-Entity-Kategorien, als für das Englische. Abhilfe kann hierfür die Möglichkeit bieten, die vorhandenen Modelle weiter zu trainieren. Problematisch hierbei ist bloß, dass die für das Training zu verwendeten Texte natürlich POS- und Named-Entity-Tagged sein müssen, was einen hohen Arbeitsaufwand darstellen kann.
+
+\subsubsection{Lemmatisierung}
+Zu jedem Token ermittelt SpaCy außerdem eine Lemmatisierung. Dabei wird das jeweilige Wort in seine Grundform umgewandelt. Da hier die Lemmatisierungen für die deutsche Sprache teilweise nicht zufriedenstellend sind, wird zusätzlich das Python Package spacy-iwnlp verwendet. 
+\\Spacy-iwnlp erweitert den Lemmatizer von SpaCy um eine im Zuge der 'Computational Linguistics and the 7th International Joint Conference on Natural Language Processing' entwickelten Wortliste und den zugehörigen Lemmatisierungen. 
+
+\subsubsection{Preprocess-Klasse}
+Die im vorangegangen Berechnungen stellt SpaCy automatisch mit der nlp-Objekt-Initialisierung bereit. Die eigentliche Schwierigkeit besteht also im folgenden darin mithilfe der generierten Textinformationen die bedeutungstragenden Begriffe eines Textes herauszufiltern.
+
+Hierfür wurde ein Package mit der Klasse Preprocess angelegt, welches diese Informationen benutzt um eine zufriedenstellende Textaufbereitung berechnen zu können.
+Der Workflow des Preprocessings besteht hierbei im wesentlichen aus dem Folgenden:
+\begin{enumerate}
+\item Erweitern des SpaCy Tokenizers mit einer eigenen Tokenisierungsregel.
+\item Extraktion der Tokenindexe aller Nominalphrasen und Named-Entities. Die Nominalphrasen werden hierfür nochmals bereinigt, was bedeutet, dass unwichtige Wörter/Stoppwörter, wie z.B. 'der', 'die', 'das', entfernt werden.
+\item Ggf. Zusätzliche Unterteilung der Tokens in die Sätze des Textes.
+\item Untersuchung der einzelnen Tokens auf ihre bedeutungstragende Rolle mit folgenden Kriterien:
+\begin{itemize}
+\item Gehört der Token dem POS-Tag-Set an, das als bedeutungstragend definiert wurde?
+\item Ist der Token kein Stoppwort?
+\item Ist der Token kein Satzzeichen oder Whitespace?
+\item Befindet sich der Token in dem vorher generierten Tokenindex von Nominalphrasen und Named-Entities?
+\end{itemize}
+\item Lemmatisierung und Umwandlung in Kleinbuchstaben, der bedeutungstragenden Tokens. Es wir zuerst überprüft, ob eine Lemmatisierung über spacy-iwnlp zur Verfügung steht, ansonsten wird die Standard-Lemmatisierung ausgewählt.
+\end{enumerate}
+
+Je nach Einstellung werden die Ergebnistokens als ein eindimensionales oder zweidimensionales Array (Unterteilung in Sätze) zurückgegeben.
+\begin{itemize}
+\item 1d-Array: [Token1, Token2, Token3, ...]
+\item 2d-Array (split by sentence): [[Token1, Token2], [Token3, Token4, ...], ..]
+\end{itemize}
+Des Weiteren ist es möglich  mit der entsprechenden Einstellung zu jedem Token die genaue Stelle im Originaltext zu speichern. Anstatt der Speicherung des einzelnen Tokens wird ein Tripel mit folgenden Informationen gespeichert: 
+\begin{itemize}
+\item 1d-Array: [(<Index Anfangsbuchstabe>, <Index Endbuchstabe>, Token1), (Tripel2), ...]
+\item 2d-Array: [[(Tripel1), (Tripel2)], [(Tripel3), ... ], ...]
+\end{itemize}
+
+\section{Ergebnis}
+Im Zuge der Implementierung einer Textaufbereitung für die deutsche Sprache wurde also ein einfach zu benutzendes Python3 Package erstellt, welches ebenfalls mit einer MIT Lizenz auf den Python Package Index (Pypi) gepublisht wurde. 
+
+Links:
+\begin{itemize}
+\item GitHub: \url{https://github.com/Mistscream/spacy_german_preprocessing}
+\item PyPi: \url{https://pypi.org/project/spacy-german-preprocess/}
+\begin{itemize}
+\item Install with pip: \$ pip install spacy-german-preprocess
+\item Nur für Python version 3 (Entwickelt unter 3.7.1)
+\end{itemize}
+\item Beispielverwendung als Jupyter Notebook: \url{https://github.com/Mistscream/spacy_german_preprocess_showcase/blob/master/preprocess-showcase.ipynb}
+\end{itemize}
+
+\subsection{Beispiel}
+Eine detaillierte Beschreibung, wie das entwickelte Package verwendet wird, befindet sich in dem oben genannten Jupyter Notebook.
+
+Deshalb hier nur ein kleiner Auszug für einen kleinen Beispieltext:
+\begin{minted}[xleftmargin=20pt,linenos,breaklines,fontsize=\small]{python}
+    from spacy_preprocessing.preprocess import Preprocess
+    
+    text = "Der 18-jährige blinde Passant wurde am 18.07.2018 um 15.30 Uhr tot in der Braunschweiger Straße mit mehreren Messerstichen aufgefunden. Die Polizeidirektion Neukölln ermittelt und bittet um Hilfe."
+    
+    # Hat zusätzliche Einstellungsparameter: sentence_split & with_pos
+    # default sentence_split=True, with_pos=False
+    preprocessed = Preprocess(text)
+    
+    # default preprocess wird zur Objekt-Initialisierung berechnet und in das preprocessed-Attribut gespeichert
+    print(preprocessed.preprocessed)
+    #--> [['18', 'jährig', 'blind', 'passant', '18.07.2018', '15.30', 'uhr', 'tot', 'braunschweiger', 'straße', 'viel', 'messerstich', 'auffinden'], ['polizeidirektion', 'neukölln', 'ermitteln', 'bitten', 'hilfe']]
+    
+    # preprocess-Methode ist allerdings auch separat aufrufbar
+    print(preprocessed.preprocess(sentence_split=False))
+    # --> ['18', 'jährig', 'blind', 'passant', '18.07.2018', '15.30', 'uhr', 'tot', 'braunschweiger', 'straße', 'viel', 'messerstich', 'auffinden', 'polizeidirektion', 'neukölln', 'ermitteln', 'bitten', 'hilfe']
+    
+    print(preprocessed.preprocess(with_pos=True))
+    [[(4, 6, '18'), (7, 14, 'jährig'), (15, 21, 'blind'), (22, 29, 'passant'), (39, 49, '18.07.2018'), (53, 58, '15.30'), (59, 62, 'uhr'), (63, 66, 'tot'), (74, 88, 'braunschweiger'), (89, 95, 'straße'), (100, 108, 'viel'), (109, 122, 'messerstich'), (123, 134, 'auffinden')], [(140, 156, 'polizeidirektion'), (157, 165, 'neukölln'), (166, 175, 'ermitteln'), (180, 186, 'bitten'), (190, 195, 'hilfe')]]
+    \end{minted}
+
+\subsection{Verbesserungsmöglichkeiten}
+Mögliche Verbesserungsmöglichkeiten für die Zukunft könnten sein:
+\begin{itemize}
+\item Erweitern/Verändern/Verbessern der von SpaCy bereitgestellten Stoppwortliste für die deutsche Sprache.
+\item Erweitern der von spacy-iwnlp benutzten JSON-Datei für die Lemmatisierungen, speziell für Begriffe, die oft in Polzeiberichten vorkommen.
+\item Erweitern des deutschen Sprachmodells von SpaCy durch weiteres Trainieren. Problematisch: Woher bekommt man gute bereits POS- und Named-Entity-Tagged Daten, ansonsten sehr hoher Arbeitsaufwand.
+\item Evtl. Performance verbessern. Momentan pro Text ca. 2 Sekunden. Kann allerdings kaum verbessert werden, da der Großteil SpaCy geschuldet ist.
+\end{itemize}
 
 
 
