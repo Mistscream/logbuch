@@ -1,0 +1,335 @@
+\chapter{Rust Crawler \small(Schmeling)}
+\label{cha:rust}
+Im folgenden Kapitel wird der Rust Crawler erläutert. Es werden im Kern der
+Planungs- und Entwicklungsprozess beschrieben. Zunächst soll aber darauf
+eingegangen werden, welche Motivation dahintersteckt, einen Crawler in einer
+anderen Programmiersprache als der vorgesehenen Sprache Python\cite{python}
+zu entwickeln, um was für eine Sprache es sich dabei handelt und welche Vor- und
+Nachteile zu erwarten sind.
+
+
+\section{Motivation}
+\label{sec:rust_motivation}
+Im Studium werden von den Studenten/innen in nahezu allen Veranstaltungen
+Implementierungen der gelehrten Anwendungen und Systeme erarbeitet. Und in
+nahezu jeder Veranstaltung werden die Technologien - das heißt die
+Programmiersprachen, Frameworks oder Bibliotheken - vorgegeben. Da das
+Einarbeiten in neue Technologien oft sehr zeitraubend ist, wird in vielen
+Fällen auf dem vorhandenen Wissen der Studenten/innen aufgebaut. Leider wird
+dadurch aber auch der Blick über den Tellerrand hinaus kaum gefördert. Umso
+mehr Motivation entsteht dann, wenn den Studenten/innen die Möglichkeit
+gegeben wird, die verwendeten Technologien selbst auszuwählen und im Rahmen
+der Veranstaltung zu erforschen, um ein gegebenes Ziel zu erreichen.\\
+Da im Rahmen des Veranstaltungskonzeptes das Verfolgen von eigenst gesetzten
+Lernzielen im Mittelpunkt steht, bot es sich an, das Lernziel so zu
+formulieren, dass das Einarbeiten in eine neue Programmiersprache Teil dessen
+wird. So steht das Lernziel auf zwei zentralen Säulen:
+
+\begin{itemize}
+	\item Wie entwickele ich einen Crawler?
+	\item Wie entwickele ich mit der Programmiersprache Rust\cite{rust}?
+\end{itemize}
+
+In den beiden folgenden Abschnitten soll nun darauf eingegangen werden, um
+was für eine Programmiersprache es sich bei Rust handelt und warum diese für
+den gegebenen Anwendungsfall eine mögliche Alternative zu Python darstellt.
+
+\subsection{Die Programmiersprache Rust}
+\label{sub:rust_sprache}
+Rust ist eine Systemprogrammiersprache vergleichbar mit C/C++, ist aber im
+Gegensatz eine sehr junge Programmiersprache. Version 1.0 erschien im Mai
+2015. Rust weist einige Gemeinsamkeiten mit C/C++ auf:
+\begin{itemize}
+	\item minimale Runtime und kein Garbagecollector, dadurch als
+	      Systemprogrammiersprache für beispielsweise Gerätetreiber, Embedded
+	      Devices, Betriebssysteme einsetzbar
+	\item Geschwindigkeit auf dem selben Level
+	\item Kontrolle
+	\item Generische Datentypen
+\end{itemize}
+
+Gleichzeitig besitzt Rust aber Merkmale, die in C/C++ nicht zu finden sind:
+\begin{itemize}
+	\item Kein manuelles Speichermanagement erforderlich
+	\item Keine Segfaults
+	\item Keine Dataraces
+\end{itemize}
+
+Das zentrale Modell, dass alle diese Eigenschaften erlaubt, ist das
+Ownership-Modell\cite{ownership}. Jede Variable in Rust hat genau einen
+Besitzer (Owner). Nur der Besitzer darf entscheiden, was mit einer Variable
+passiert. Dabei gibt es drei mögliche Handlungen:
+\begin{itemize}
+	\item Besitzer gibt Variable weiter, verzichtet damit auf den Besitz und
+	      kann die Variable nicht mehr verwendeten
+	\item Besitzer leiht Variable aus (Referenz), die Variable kann nur
+	      lesend vom Ausleiher verarbeitet werden. Es kann beliebig viele
+	      gleichzeitige Ausleihen geben.
+	\item Besitzer leiht Variable veränderlich aus (mutable Reference), die
+	      Variable kann von dem Ausleiher lesend und schreibend verarbeitet werden.
+	      Es kann aber nur eine Ausleihe zur gleichen Zeit geben. Es darf neben
+	      einer veränderlichen Ausleihe auch keine unveränderlichen Ausleihen
+	      geben.
+\end{itemize}
+
+Rust bietet einige Highlevel-Abstractions, wie man sie nur aus
+Programmiersprachen mit Garbagecollection kennt, wodurch Rust sich angenehm
+schreiben und lesen lässt. Zudem Rust erlaubt funktionale, objektorientierte
+und auch nebenläufige Programmierung. Diese Eigenschaften zusammen mit der
+Geschwindigkeit und der Speichersicherheit machen Rust auch für viele andere
+Anwendungsbereiche interessant, wie beispielsweise Webserver,
+Anwendungsentwicklung, Spiele, etc.\\
+Zuletzt soll noch Cargo\cite{cargo} erwähnt werden, welches Rust's Projekt-,
+Build- und Dependency-Management-Tool ist. Bibliotheken werden in Rust an
+einem zentralen Ort - \url{https://www.crates.io}) - zur Verfügung gestellt.
+Cargo und Rust-Bibliotheken verhalten sich vergleichbar zu NPM\cite{npm} und
+Node\cite{node}-Modulen. Dadurch ist das Verwalten von Projekten, das managen
+von Bibliotheken und das Testen und Kompilieren extrem einfach und
+nutzerfreundlich.
+
+
+\subsection{Crawler und Rust}
+\label{sub:crawlrust}
+Die folgende Liste stellt stichpunktartig dar, welche Eigenschaften von Rust
+für die Entwicklung eines Crawlers sprechen.
+\begin{itemize}
+	\item Geschwindigkeit: hiermit ist die tatsächlich abrufbare
+	      CPU-Geschwindigkeit gemeint, die beim Parsen von Dokumenten ein Vorteil
+	      sein kann
+	\item Concurrency: parallele Anfragen verarbeiten
+	\item Einbinden vorhandener Bibliotheken aus anderen Programmiersprachen:
+	      fehlende Rust-Bibliotheken können ersetzt werden
+\end{itemize}
+
+
+\section{Planung}
+\label{sec:rust_planung}
+Zunächst muss überlegt werden, welche Funktionalitäten für die
+Implementierung des Crawlers benötigt werden. Dabei hilft aufzuzeigen, in
+welchen Schritten ein Crawler arbeitet. Folgende Liste soll eine Schleife
+darstellen, die wiederholt wird:
+\begin{itemize}
+	\item Url aus Url-Queue nehmen
+	\item Get-Anfrage senden
+	\item Responsebody verarbeiten
+	      \begin{itemize}
+		      \item Urls extrahieren und an Url-Queue anhängen
+		      \item Polizeiberichte extrahieren und in Datenbank speichern
+	      \end{itemize}
+\end{itemize}
+
+Aus diesen Einzelschritten ergeben sich die Funktionalitäten, die
+implementiert werden müssen:
+\begin{itemize}
+	\item Urls in Datenstruktur speichern
+	\item Http-Get-Anfragen senden, möglichst asynchron
+	\item Html-Body gezielt auf Elemente, Klassen, IDs, etc. hin durchsuchen und
+	      extrahieren, möglichst parallel
+	\item Paralleles Verarbeiten der Html-Bodies
+	\item Schnittstelle für Datenbank implementieren
+	\item Zeitmessung für Diagnose und Vergleich
+\end{itemize}
+
+Für alle diese Funktionalitäten lassen sich Bibliotheken finden. Dabei sind
+die Bibliotheken unabhängig vom gegebenen Anwendungsfall und unabhängig
+untereinander. Jeder einzelne Schritt muss manuell implementiert werden, da
+es bisher keinerlei Bibliothek oder Framework zum Crawlen gibt.\\
+Folgende Liste enthält die Bibliotheken, die für die Umsetzung benötigt werden:
+\begin{itemize}
+	\item reqwest\cite{reqwest}: Http-Get-Anfragen senden
+	\item select\cite{select}: Html-Dokumente extrahieren
+	\item rayon\cite{rayon}: Parallelität
+	\item tokio\cite{tokio}: Asynchronität
+	\item chrono\cite{chrono}: Zeit messen
+	\item mongodb\cite{mongodb}: Datenbankschnittstelle
+\end{itemize}
+
+
+\section{Implementierung}
+\label{sec:rust_implementierung}
+Zentrales Element des Crawlers ist eine Schleife, die folgende Logik wiederholt:
+\begin{itemize}
+	\item Anfragen an alle Urls in der Url-Queue senden
+	\item Urls aus den Response-Bodies extrahieren und an die Url-Queue anhängen
+	\item Polizeiberichte aus den Response-Bodies extrahieren und in die
+	      Datenbank speichern
+	\item Abfrage, ob es noch unbesuchte Urls in der Url-Queue gibt: wenn nein,
+	      Programmende
+\end{itemize}
+
+Die genaue Arbeitsweise wird in den folgenden Unterkapiteln näher beschrieben.
+
+
+
+\subsection{Url-Queue}
+Die Url-Queue wurde als HashMap implementiert, die als Schlüssel die Url und
+als Value ein Boolschen Wert enthält, der angibt, ob eine Url bereits
+angefragt wurde. Durch die Implementierung als HashMap lässt sich sehr
+einfach abfragen, ob eine bestimmte Url bereits in der Url-Queue vorhanden
+ist. Dies ist von Bedeutung, da sich bestimmte Urls auf vielen Internetseiten
+wiederfinden und es keine doppelten Urls in der Url-Queue geben soll ,da es sonst
+zu Mehrfachanfragen an ein und dieselbe Url gibt.
+
+\begin{minted}[xleftmargin=20pt,linenos,breaklines,fontsize=\small]{rust}
+    let mut url_queue: HashMap<String, bool> = HashMap::new();
+\end{minted}
+
+
+\subsection{Http-Get-Anfragen}
+Zu Beginn der Schleife wird an alle Urls in der Url-Queue, an die noch keine
+Anfrage gesendet wurde, eine Get-Anfrage gesendet. Sollte es eine erfolgreiche
+Antwort geben, dann wird der Html-Body in einer Liste gespeichert und die
+zugehörige Url wird markiert als bereits angefragt.
+
+\begin{minted}[xleftmargin=20pt,linenos,breaklines,fontsize=\small]{rust}
+let mut bodies: Vec<String> = Vec::new();
+for (url, state) in url_queue.iter_mut() {
+    if *state == false {
+        match request::get(&url) {
+            Some(res) => {
+                bodies.push(res);
+                *state = true;
+            }
+            None => (),
+        }
+    }
+}
+\end{minted}
+
+Für die eigentliche Get-Anfrage wird folgende Funktion genutzt:
+
+\begin{minted}[xleftmargin=20pt,linenos,breaklines,fontsize=\small]{rust}
+pub fn get(url: &str) -> Option<String> {
+    let body = reqwest::get(url);
+    if body.is_err() {
+        return None;
+    }
+
+    let mut body = body.unwrap();
+    if !body.status().is_success() {
+        return None;
+    }
+
+    let body = body.text();
+    if body.is_err() {
+        return None;
+    }
+
+    let html = body.unwrap();
+
+    Some(html)
+}
+\end{minted}
+
+Die Methode gibt dabei im Fall des Erfolges einen String zurück (den
+Html-Body), im Falle eines Misserfolges gibt sie nichts zurück
+(strenggenommen gibt sie ein \emph{None} zurück, was einem \emph{Null} in
+anderen Programmiersprachen ähnelt).\\
+Anmerkung: sämtliche Get-Anfragen des Crawlers geschehen synchron. Leider war es
+nicht mehr möglich, die asynchrone Funktionalität zu implementieren. Mehr dazu
+in Kapitel \ref{sec:rust_ergebnis}.
+
+
+\subsection{Urls extrahieren}
+Nun wird über alle Html-Bodies iteriert und aus jedem Body werden Urls
+extrahiert. Alle Urls, die noch nicht in der Url-Queue sind, werden an diese
+angehängt.
+
+\begin{minted}[xleftmargin=20pt,linenos,breaklines,fontsize=\small]{rust}
+for body in bodies.iter() {
+    let urls = url::from_html(&body);
+    for url in urls {
+        if !url_queue.contains_key(&url) {
+            url_queue.insert(String::from(url), false);
+        }
+    }
+}
+\end{minted}
+
+Für das Extrahieren der Urls aus den Bodies wird folgende Funktion verwendet:
+
+\begin{minted}[xleftmargin=20pt,linenos,breaklines,fontsize=\small]{rust}
+pub fn from_html(html: &str) -> Vec<String> {
+    let mut urls: Vec<String> = Vec::new();
+    let document = Document::from(html);
+
+    for elem in document.find(Name("a")) {
+        match elem.attr("href") {
+            Some(url) => {
+                let mut url = String::from(url);
+                if url.starts_with("/") {
+                    url.insert_str(0, "https://www.berlin.de");
+                }
+                if url.starts_with("https://www.berlin.de/polizei/polizeimeldungen/archiv/20")
+                    && url.contains("page_at")
+                {
+                    urls.push(url);
+                }
+            }
+            None => (),
+        }
+    }
+
+    urls
+}
+\end{minted}
+
+Mit Hilfe der Bibliothek \emph{select} werden alle \emph{a}-Elemente gesucht
+und der Wert des Attributs \emph{href} extrahiert. Da einige Urls nur als
+Subdomain angegeben sind, müssen diese noch aufgefüllt werden. Und zuletzt
+werden nur die Urls in die Liste getan, die die Archiv-Seiten adressieren.
+
+
+\subsection{Polizeiberichte extrahieren}
+Nun wird über alle Html-Bodies iteriert und in jedem Body wird nach
+Polizeiberichten gesucht. Anschließend werden die Berichte in der Datenbank
+gespeichert.
+
+\begin{minted}[xleftmargin=20pt,linenos,breaklines,fontsize=\small]{rust}
+let reports: Vec<Report> = bodies
+    .iter()
+    .flat_map(|b| Report::from_html(b))
+    .collect();
+
+for report in reports {
+    mongo.add(report);
+}
+\end{minted}
+
+Für das Finden der Polizeiberichte wird folgende Funktion verwendet:
+
+\begin{minted}[xleftmargin=20pt,linenos,breaklines,fontsize=\small]{rust}
+pub fn from_html(html: &str) -> Vec<Report> {
+    let mut reports: Vec<Report> = Vec::new();
+
+    let document = Document::from(html);
+    let li_elements: Vec<select::node::Node> = Vec::new();
+    for elem in document.find(Class("list-autoteaser").descendant(Class("row-fluid"))) {
+        let title = Report::parse_title(elem);
+        let url = Report::parse_url(elem);
+        let location = Report::parse_location(elem);
+        let date = Report::parse_date(elem);
+        let text = Report::parse_text(&url);
+
+        if text.len() > 0 {
+            reports.push(Report::new(title, url, location, date, text));
+        }
+    }
+
+    reports
+}
+\end{minted}
+
+Dabei wird wieder die Bibliothek \emph{select} genutzt, um gezielt Html-Elemente
+und deren Nachfahren zu finden und Attribute auszulesen. Nach welchen
+Elementen gesucht werden muss, wurde vorher manuell aus Quelltexten einiger
+Internetseiten, die einen Polizeibericht enthalten, herausgelesen.\\
+Zum Parsen der gesuchten Attribute Titel, Url, Ort, Datum und Uhrzeit sowie
+dem eigentlichen Text wurden Helfer-Funktionen genutzt. Diese funktionieren
+aber analog zu obiger Funktion und werden hier daher nicht abgedruckt.
+
+\section{Ergebnis}
+\label{sec:rust_ergebnis}
+
+
+\subsection{Verbesserungsmöglichkeiten}
