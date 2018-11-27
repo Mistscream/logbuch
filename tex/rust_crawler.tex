@@ -330,6 +330,55 @@ aber analog zu obiger Funktion und werden hier daher nicht abgedruckt.
 
 \section{Ergebnis}
 \label{sec:rust_ergebnis}
-
+Es wurde erfolgreich ein Crawler in der Programmiersprache Rust entwickelt,
+der die Polizeiberichte der Berliner Polizei crawlt und in einer Datenbank
+speichert. Das Ziel, einen Crawler zu implementieren, wurde erreicht. Das
+Ziel, in der Programmiersprache Rust zu entwickeln, wurde zwar auch erfüllt,
+jedoch nicht zu meiner vollen Zufriedenheit. Durch die geringen
+Vorerfahrungen mit Rust war es teils sehr mühselig, selbst einfache Dinge zu
+implementieren. Es hat sich gezeigt, was ich vorher durchaus vermutet habe: Rust
+ist keine einfach zu erlernende Programmiersprache. Ich bin meinem Lernziel
+dabei trotzdem nah gekommen, da ich im Lauf der Entwicklung wirklich viel
+über Rust lernen konnte. Da das zu einem großen Teil aber an gemachten
+Fehlern und zeitintensiver, teils frustrierender Fehlersuche lag, war die
+Erfahrung dabei durchwachsen.\\
+Grundsätzlich ist die Dokumentation der genutzten Bibliotheken gut. Jedoch
+wird ein gewisses Maß an Erfahrung im Umgang mit Rust
+vorausgesetzt. Das war ein Faktor, weshalb das Arbeiten mit einigen
+Bibliotheken recht mühsam war. Da Rust zudem eine sehr junge
+Programmiersprache ist, gibt es verhältnismäßig wenige Beispiele dafür zu
+finden, wie gewisse Problem gelöst werden können. Ich musste
+unverhätlnismäßig viel Zeit in die Recherche der Funktionsweise von
+Bibliotheken, unter anderen auch der Standardbibliothek, investieren.\\
+Leider gelang es mir trotz intensiver Recherche nicht, die Bibliothek
+\emph{tokio} mit einzubinden, weshalb asynchrone Get-Anfragen nicht mehr
+implementiert werden konnten. Dabei habe ich aber auch die Unterschiede und
+Einsatzgebiete von OS-Threads, Green-Threads and Async I/O lernen können.
+Grundsätzlich wäre die Implementierung von OS-Threads in Rust relativ einfach
+- bedingt durch die Low-Level-Eigenschaften von Rust. Jedoch sind diese für
+asynchrone Anfragen fehl am Platz. Hier würden sich Green-Threads anbieten
+oder eben Async I/O, wobei \emph{tokio} als Referenz-Bibliothek für Async I/O
+in Rust gilt. Allerdings habe ich nicht nur durch Erfahrung, sondern auch
+durch Recherche festgestellt, dass ich bei weitem nicht der/die Einzige bin
+mit Problemen beim Verständnis der Funktionsweise von \emph{tokio}.
 
 \subsection{Verbesserungsmöglichkeiten}
+Als zentraler Punkt sei hier nochmal \emph{tokio} und Async I/O genannt.
+Derzeit arbeitet das Rust-Entwicklerteam an der Weiterentwicklung und
+Überarbeitung von asynchronen Funktionalitäten, teilweise sollen diese mit in
+die Standardbibliothek aufgenommen werden. Erste Beispiele zeigen, dass das
+händeln von asynchronen Abläufen damit deutlich vereinfacht werden wird.
+Leider war und ist bisher aber noch kein Stand erreicht, der das neue
+Async-Modell benutzbar macht. Das Rust-Entwicklerteam rechnet damit, dies in
+den kommenden Monaten zu vervollständigen. Der Grundtenor in der
+Rust-Community ist derzeit jener, sich als Beginner noch nicht mit Async I/O
+auseinanderzusetzen, sondern zu warten, bis das neue Async-Modul fertig ist,
+da es dadurch enorme Änderungen und Erleichterungen in der Implementierung
+gibt.\\
+Als weitere Verbesserungsmöglichkeit sehe ich allgemein die Implementierung
+in Rust. Zwar funktioniert der Crawler wie gewünscht, jedoch ist mein
+Eindruck vom Programm der, dass sowohl der Aufbau bzw. die Struktur als auch
+viele Stellen im Quelltext nicht dem entsprechen, was mit Rust möglich wäre
+und was man in Rust als idiomatisch ansieht. Hier fehlt mir einfach die
+Erfahrung im Ausreizen der Möglichkeiten, die Rust zur Verfügung stellt. Der
+Quelltext sieht unschön aus.
