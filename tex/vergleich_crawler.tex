@@ -1,12 +1,10 @@
-\chapter{Gesamtergebnis \small{(Stach \& Schmeling)}}
-
-\section{Vergleich der Crawler}
+\chapter{Vergleich der Crawler}
 Ein Teil des ersten Lernziels war es, die entwickleten Crawler zu vergleichen.
 In der Folge wird dies gemacht, dabei wird Unterschieden zwischen
 planerischen, implementierungs-relevanten und ergebnis-orientierten Aspekten.
 
 
-\subsection{Planung}
+\section{Planung}
 
 \begin{tabular}{l}
 	Waren Bibliotheken/Frameworks leicht zu finden? \\
@@ -72,7 +70,7 @@ planerischen, implementierungs-relevanten und ergebnis-orientierten Aspekten.
 	\end{tabular}
 \end{tabular}
 
-\subsection{Implementierung}
+\section{Implementierung}
 
 \begin{tabular}{l}
 	War die Nutzung der verwendeten Bibliotheken und Frameworks einfach? \\
@@ -139,7 +137,7 @@ planerischen, implementierungs-relevanten und ergebnis-orientierten Aspekten.
 \end{tabular}
 
 
-\subsection{Ergebnis}
+\section{Ergebnis}
 
 \begin{tabular}{| l | c | c | c | c | c | c | c | c | c | c |}
 	\hline
@@ -147,46 +145,11 @@ planerischen, implementierungs-relevanten und ergebnis-orientierten Aspekten.
 	\hline
 	Python     & \makecell{2 Tage \\ (Anzahl der Requests \\ wurde limitiert auf  \\ Anfrage durch \\ die Serverbetreiber)} & 9964 &  \makecell{ca. 180 \\ selbst geschriebene  \\ (Die Spacy CLI legt \\ weitere Dateien mit vielen \\ Eintellungsmöglichkeiten an)} \\
 	\hline
-	Rust       & 5h 15min & 9964 & ca. 280 \\
+	Rust       & 5h 15min & 9964 & zehn \\
 	\hline
 	Javascript & & &\\
 	\hline
 \end{tabular}
 
-
 \section{Fazit}
-Für den produktiven Einsatz unseres Crawlers haben wir uns für die in Python entwickelte Variante entschieden.
-Das Scrapy Framework bietet bei weitem die meisten Möglichkeiten und ist leicht erweiterbar.
-In JavaScript und Rust existieren zwar Libraries zum entwickeln eines Crawlers, ein komplettes Framework, was einem
-viele Aufgabe abnehmen kann, existiert jedoch nicht.
-
-Lezteres haben wir noch das Crawling mit dem Preprocessing vereint. Durch die Entwicklung einer PreProcessing-Pipeline
-werden jetzt die Ergebnisse des Crawl-Vorgangs, bevor Sie in die Datenbank geschrieben werden, noch durch den von uns
-entwickelten Preprocessing Algorithmus behandelt. Dadurch ergibt sich ein Endergebnis von ca. 10.000 gecrawlten und preprocessten
-Polizeiberichten in der MongoDB. Folgend ein Beispiel eines Polizeiberichts:
-
-
-\begin{minted}[xleftmargin=20pt,linenos,breaklines,fontsize=\small]{json}
-{
-  "_id": {
-    "$oid": "5bf97a29ca8c53043dcabe4d"
-  },
-  "category": "Friedrichshain-Kreuzberg",
-  "timestamp": {
-    "$date": "2018-11-24T16:30:00.000+0000"
-  },
-  "title": "Auseinandersetzung zwischen zwei Gruppen",
-  "url": "https://www.berlin.de/polizei/polizeimeldungen/pressemitteilung.760957.php",
-  "text": "...",
-  "text_pre_processed_v1": ["..."],
-  "text_pre_processed_v2": [["..."]],
-  "text_pre_processed_v3": [[0, 14, "..."]],
-  "text_pre_processed_v4": [[[0, 14, "..."]]],
-  "updated": {
-    "$date": "2018-11-24T17:43:22.896+0000"
-  },
-  "created": {
-    "$date": "2018-11-24T17:19:53.191+0000"
-  }
-}
-\end{minted}
+Python ist schon ganz gut geeignet, ne?\\
