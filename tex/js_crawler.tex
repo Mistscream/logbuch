@@ -1,0 +1,161 @@
+
+
+\chapter{JavaScript Crawler \small(Ilyina)}
+\label{ch: JavaScript Crawler}
+
+\section{Planung}
+\label{sub:js_planung}
+
+Das Lernziel, einen Crawler in der Programmiersprache JavaScript zu entwickeln,
+wurde formuliert, um sowohl eine alternative Lösung zu dem Python- und
+dem Rust-Crawler anzubieten, als auch die Kenntnisse in JavaScript zu verbessern.
+
+Dafür wurde zunächst recherchiert, welche Frameworks es schon gibt, um ein Crawler
+in JavaScript zu implementieren. Im Internet sind einige Frameworks zu finden,
+die eine umfassende Lösung für den Bau eines Crawler anbieten. Aber dadurch,
+dass das Lernziel auch beinhaltet, ein tieferes Verständnis für den Crawler-Bau
+zu entwickeln, wurden unterschiedliche Libraries für die einzelnen Schritte
+verwendet.
+
+\section{Implementierung}
+\label{sub:js_implementierung}
+
+Für die Implementierung wurden benutzt:
+
+\begin{itemize}
+  \item
+    NodeJS
+  \item
+    Node-Fetch: ermöglicht HTTP-Anfragen
+  \item
+    Cheerio: ermöglicht den Zugriff auf die einzelne Elemente der Web-Seite (Daten parsen)
+  \item
+    Sleep: ermöglicht Timing bzw. Delay der HTTP-Anfragen,
+    damit der Server nicht überlastet wird (politeful crawlen)
+  \item
+    FS: ermöglicht das Speichern der gefundeneb Polizeiberichte in JSON
+\end{itemize}
+
+Die Implementierung des JavaScript-Crawlers hat eine geschachtelte Struktur,
+bei der eine Funktion die nächste aufruft und wartet, bis sie fertig ist.
+
+Am Anfang  wird eine kleine \textbf{main} Funktion aufgerufen, die die weiteren Funktionen
+aufruft. Die dient dazu, einen Fehler der Implementierung sofort abzufangen und auszugeben.
+
+\begin{minted}[xleftmargin=20pt,linenos,breaklines,fontsize=\small]{javascript}
+  async function main() {
+    try {
+      const archives = await startPage(urlFirst);
+    } catch (exception) {
+      console.log(exception);
+    }
+  }
+  main();
+  \end{minted}
+
+\subsection{StartPage Funktion}
+
+Die Funktion ist so implementiert, dass zunächst die URLs von allen Archiv-Jahren
+gefunden und in ein Array gespeicht werden.
+
+\begin{minted}[xleftmargin=20pt,linenos,breaklines,fontsize=\small]{javascript}
+  const archives = $('.column-content .textile > ul > li > a').map(function(){
+    return base_url + $(this).attr('href');
+  }).toArray();
+  \end{minted}
+
+Danach wird für jede URL aus dem Array die Funktion 
+\textbf{pageArchive} aufgerufen und gewartet, bis sie fertig ist.
+
+\begin{minted}[xleftmargin=20pt,linenos,breaklines,fontsize=\small]{javascript}
+  let reports = [];
+  for (i in archives) {
+    reports = [
+      ...reports,
+      ...await pageArchive(archives[i])
+    ];
+  }
+  \end{minted}
+
+\subsection{PageArchive Funktion}
+
+Diese Funktion parst die einzelnen Archivseiten.
+Zunächst wird eine Anfrage geschickt und auf die Antwort gewartet.
+
+\begin{minted}[xleftmargin=20pt,linenos,breaklines,fontsize=\small]{javascript}
+  sleep.msleep(delay);
+  const response = await fetch(url);
+  if (!response.ok) {
+    console.log(url + ' - does not work...')
+    console.log(response.statusText);
+    console.log(response.status);
+  }
+  const html = await response.text();
+  \end{minted}
+
+Hier werden die Metadaten der Polizeiberichten gesammelt, insbesonders die URL der einzelnen Polizeimeldungen.
+
+\begin{minted}[xleftmargin=20pt,linenos,breaklines,fontsize=\small]{javascript}
+  const html = await response.text();
+  const $ = cheerio.load(html);
+  const reports = $('.row-fluid').map(function() {
+    const dateModified = $(this).children('.span2.cell.date').text();
+    const title = $(this).children('.span10.cell.text').text();
+    const reportLink = base_url + $(this).children('.span10.cell.text').children('a').attr('href');
+    const category = $(this).children('.span10.cell.text').children('.category').text();
+    return {
+      title,
+      reportLink,
+      dateModified,
+      category
+    };
+  }).toArray();
+  \end{minted}
+
+So wird ein Array von Report-Objekten erzeugt. Danach wird die
+\textbf{PageInfo}-Funktion aufgerufen, um den eigentlichen Inhalt des Berichtes zu bekommen,
+und gewartet, bis die Funktion fertig ist.
+
+\begin{minted}[xleftmargin=20pt,linenos,breaklines,fontsize=\small]{javascript}
+  let returnReports = [];
+  for (i in reports) {
+    returnReports.push({
+      ...reports[i],
+      ...await pageInfo(reports[i].reportLink)
+    });
+  }	
+  \end{minted}
+
+Zum Schluss wird überprüft, ob eine Folgeseite des Jahres-Archives existiert, und wenn ja, wird die
+Funktion sich selbst aufrufen und auf das Ergebnis warten.
+
+\begin{minted}[xleftmargin=20pt,linenos,breaklines,fontsize=\small]{javascript}
+  
+  \end{minted}
+
+\subsection{PageInfo Funktion}\label{header-n94}
+
+Die Funktion parst die einzelne Polizeibericht-Seiten, holt die Polizeiberichtsnummer und den eigentlichen
+Inhalt, und liefert die geparste Information zurück an die \textbf{PageInfo}-Funktion,
+die es zu dem Report-Objekt hinzufügt.
+
+\begin{minted}[xleftmargin=20pt,linenos,breaklines,fontsize=\small]{javascript}
+  const tryHardHref = $('.pager-item-next > a').attr('href');
+  if (tryHardHref) {
+    const link = base_url + tryHardHref;    
+    returnReports = [
+      ...returnReports,
+      ...await pageArchive(link)
+    ];
+  }
+  \end{minted}
+
+\section{Ergebnis}\label{header-n6}
+
+Es wurde erforgreich einen Crawler in der Programmiersprache JavaScript implementiert, der alle online zur Verfügung gestellten Polizeiberichte sammelt und in eine JSON-Datei speichert.
+
+Das Lernziel, den Bau eines Crawlers zu verstehen und die Kenntnisse in der Programmiersprache Javascript zu verbessern, wurde erreicht. Dadurch, dass JavaScript eine Sprache für das
+Web-Development und derzeit auch sehr populär ist, gibt es genügend Lösungen, wie die Bestandteile eines Crawlers erstellt und implemetiert werden können. Dadurch war auch die Suche von Beispielen und möglichen Lösungswegen sehr einfach.
+
+Beim Testen der Implementierung kam auch eine Antwort mit dem HTTP-Statuscode 409, was bedeutet, dass zu viele Anfragen in einem gewissen Zeitraum an den Server gesendet werden.
+Dafür wurde eine Pause zwischen den Anfragen von 250 Millisekunden gesetzt.
