@@ -1,14 +1,14 @@
 \chapter{Textaufbereitung \small(Jüngling)}
 \label{ch:Textaufbereitung}
 
-Um die Texte der Berliner Polizeiberichte in späteren Arbeitsschritten für die Implementierung einer Suchmaschine verwenden zu können, ist es nötig diese entsprechend aufzubereiten. Das bedeutet im Grunde, dass die Fließtexte auf ihre wesentlichen bedeutungstragenden Begriffe reduziert werden. 
+Um die Texte der Berliner Polizeiberichte in späteren Arbeitsschritten für die Implementierung einer Suchmaschine verwenden zu können, ist es nötig, diese entsprechend aufzubereiten. Das bedeutet im Grunde, dass die Fließtexte auf ihre wesentlichen bedeutungstragenden Begriffe reduziert werden. 
 \\Für diesen Arbeitsschritt haben wir uns für die Verwendung der mächtigen NLP Python Library SpaCy entschieden. 
 
 \section{SpaCy}
 Die Open-Source Library SpaCy ermöglicht fortgeschrittenes Natural Language Processing für mehrere Sprachen, unter Anderem der deutschen. SpaCy bietet hierfür eine Vielzahl verschiedener Features, wie z.B. Tokenization, Lammatization, Part-of-Speech Tagging, dependency parsing und demenentsprechend besonders wichtige Features, wie das Erkennen von Noun-Phrases (Nominalphrasen) und Named-Entitities (Textelemente vordefinierter Kategorien). 
 
 \section{Umsetzung}
-Im folgenden wird auf die grundsätzliche Funktionsweise der implementierten Textaufbereitung unter der Verwendung von SpaCy eingegangen.
+Im Folgenden wird auf die grundsätzliche Funktionsweise der implementierten Textaufbereitung unter der Verwendung von SpaCy eingegangen.
 
 Für die Textaufbereitung wurde ein Package mit Python 3 erstellt, welches die Klasse Preprocess enthält. Dieser Klasse muss zur Initialisierung der zu bearbeitende Text übergeben werden. Der übergebene Text wird mithilfe des deutschen Sprachmodells von SpaCy als ein von SpaCy bereitgestelltes nlp-Objekt initialisiert. 
 \\Das bereitgestellte deutsche Sprachmodell wurde auf Wikipedia Texte und dem TIGER Corpus trainiert, um so die Syntax der Texte untersuchen zu können. Unter Verwendung dieses Modells berechnet SpaCy zur nlp-Objekt-Initialisierung automatisch wichtige Textinformationen, wie Tokens, Part-of-Speech Tags, Noun-Phrases, Named-Entities und mehr. Unter Verwendung dieser Textinformationen berechnet die selbstgeschriebene Preprocess-Klasse eine der deutschen Sprache angepasste Textaufbereitung.
@@ -24,14 +24,14 @@ Nach der Tokenisierung analysiert SpaCy die ermittelten Tokens unter Verwendung 
 Mithilfe der Informationen zu den Wortarten und Wortabhängigkeiten der Tokens untereinander ermittelt SpaCy Nominalphrasen, Wortgruppen abgeschlossener Einheiten, wie z.B. "Der erschossene 85-jährige Rentner".  
 
 \subsubsection{Named-Entities}
-Des Weiteren ist es für SpaCy möglich Named-Entities, Textelemente vordefiniert Kategorien, zu ermitteln. Diese Art der Informationsextraktion ist besonders abhängig von der Genauigkeit des zur Verfügung stehenden Sprachmodells. So gibt es leider für das deutsche Modell, weniger Named-Entity-Kategorien, als für das Englische. Abhilfe kann hierfür die Möglichkeit bieten, die vorhandenen Modelle weiter zu trainieren. Problematisch hierbei ist bloß, dass die für das Training zu verwendeten Texte natürlich POS- und Named-Entity-Tagged sein müssen, was einen hohen Arbeitsaufwand darstellen kann.
+Des Weiteren ist es für SpaCy möglich, Named-Entities und Textelemente vordefinierter Kategorien zu ermitteln. Diese Art der Informationsextraktion ist besonders abhängig von der Genauigkeit des zur Verfügung stehenden Sprachmodells. So gibt es leider für das deutsche Modell weniger Named-Entity-Kategorien, als für das Englische. Abhilfe kann hierfür die Möglichkeit bieten, die vorhandenen Modelle weiter zu trainieren. Problematisch hierbei ist bloß, dass die für das Training zu verwendenden Texte natürlich POS- und Named-Entity-Tagged sein müssen, was einen hohen Arbeitsaufwand darstellen kann.
 
 \subsubsection{Lemmatisierung}
 Zu jedem Token ermittelt SpaCy außerdem eine Lemmatisierung. Dabei wird das jeweilige Wort in seine Grundform umgewandelt. Da hier die Lemmatisierungen für die deutsche Sprache teilweise nicht zufriedenstellend sind, wird zusätzlich das Python Package spacy-iwnlp verwendet. 
 \\Spacy-iwnlp erweitert den Lemmatizer von SpaCy um eine im Zuge der 'Computational Linguistics and the 7th International Joint Conference on Natural Language Processing' entwickelten Wortliste und den zugehörigen Lemmatisierungen. 
 
 \subsubsection{Preprocess-Klasse}
-Die im vorangegangen Berechnungen stellt SpaCy automatisch mit der nlp-Objekt-Initialisierung bereit. Die eigentliche Schwierigkeit besteht also im folgenden darin mithilfe der generierten Textinformationen die bedeutungstragenden Begriffe eines Textes herauszufiltern.
+Die vorangegangenen Berechnungen stellt SpaCy automatisch mit der nlp-Objekt-Initialisierung bereit. Die eigentliche Schwierigkeit besteht also im folgenden darin, mithilfe der generierten Textinformationen die bedeutungstragenden Begriffe eines Textes herauszufiltern.
 
 Hierfür wurde ein Package mit der Klasse Preprocess angelegt, welches diese Informationen benutzt um eine zufriedenstellende Textaufbereitung berechnen zu können.
 Der Workflow des Preprocessings besteht hierbei im wesentlichen aus dem Folgenden:
@@ -54,7 +54,7 @@ Je nach Einstellung werden die Ergebnistokens als ein eindimensionales oder zwei
 \item 1d-Array: [Token1, Token2, Token3, ...]
 \item 2d-Array (split by sentence): [[Token1, Token2], [Token3, Token4, ...], ..]
 \end{itemize}
-Des Weiteren ist es möglich  mit der entsprechenden Einstellung zu jedem Token die genaue Stelle im Originaltext zu speichern. Anstatt der Speicherung des einzelnen Tokens wird ein Tripel mit folgenden Informationen gespeichert: 
+Des Weiteren ist es möglich, mit der entsprechenden Einstellung zu jedem Token die genaue Stelle im Originaltext zu speichern. Anstatt der Speicherung des einzelnen Tokens wird ein Tripel mit folgenden Informationen gespeichert: 
 \begin{itemize}
 \item 1d-Array: [(<Index Anfangsbuchstabe>, <Index Endbuchstabe>, Token1), (Tripel2), ...]
 \item 2d-Array: [[(Tripel1), (Tripel2)], [(Tripel3), ... ], ...]
@@ -107,7 +107,3 @@ Mögliche Verbesserungsmöglichkeiten für die Zukunft könnten sein:
 \item Erweitern des deutschen Sprachmodells von SpaCy durch weiteres Trainieren. Problematisch: Woher bekommt man gute bereits POS- und Named-Entity-Tagged Daten, ansonsten sehr hoher Arbeitsaufwand.
 \item Evtl. Performance verbessern. Momentan pro Text ca. 2 Sekunden. Kann allerdings kaum verbessert werden, da der Großteil SpaCy geschuldet ist.
 \end{itemize}
-
-
-
-
