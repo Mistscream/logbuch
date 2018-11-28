@@ -254,3 +254,6 @@ TSWLatexianTemp*
 # editors
 .idea
 .vscode
+
+#dolphin file manager
+.dolphin
